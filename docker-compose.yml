@@ -1,0 +1,41 @@
+version: '2'
+services:
+  web-data:
+    container_name: web-data
+    image: busybox
+    volumes:
+      - "/data/www/html/public"
+    tty: true
+
+  web:
+    build: .
+    ports:
+      - "80:80"
+      - "443:443"
+    container_name: web
+    volumes_from:
+      - web-data
+
+  php-data:
+    container_name: php-data
+    image: busybox
+    volumes:
+      - "/data/www/html"
+    tty: true
+
+  php-fpm:
+    container_name: php-fpm
+    image: aiiro/centos-php-fpm:latest
+    volumes_from:
+      - php-data
+
+  db:
+    container_name: db
+    image: mariadb
+    ports:
+      - "3306:3306"
+    env_file: ./envfiles/db_env
+
+  memcached:
+    container_name: memcached
+    image: memcached
